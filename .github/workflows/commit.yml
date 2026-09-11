@@ -1,10 +1,30 @@
 name: commit
+run-name: "commit ${{ inputs.leg || github.event_name }} ${{ inputs.racecar_run }}"
 on:
   push:
     paths: ['src/*', 'src/BingoViewer/**', 'src/installer/**', '.github/**']
 
+  workflow_dispatch:
+    inputs:
+      leg:
+        description: "baseline (uninstrumented) or instrumented (under chalk/curiosity)"
+        type: choice
+        options: [instrumented, baseline]
+        default: baseline
+      profile:
+        description: "CrashOverride chalk profile"
+        type: string
+        default: curiosity-tests-racecar
+      racecar_run:
+        description: "racecar correlation token, echoed into the run name"
+        type: string
+        default: ""
+
+env:
+  CHALK_ON: ${{ inputs.leg == 'instrumented' }}
 jobs:
   windows:
+    if: false   # racecar: non-Linux runner, not measured here
     runs-on: windows-latest
     steps:
       - name: Check out repository code
